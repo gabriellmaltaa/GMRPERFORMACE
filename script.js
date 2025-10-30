@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     const hamburgerBtn = document.querySelector('.hamburger-menu');
     const mobileMenu = document.querySelector('.mobile-menu');
 
@@ -34,10 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
    
     const loginModal = document.getElementById('login-modal');
     const schedulingModal = document.getElementById('scheduling-modal');
-    
     const loginTriggers = document.querySelectorAll('.login-trigger');
     const scheduleTriggers = document.querySelectorAll('.schedule-trigger');
-    
     const newCloseButtons = document.querySelectorAll('.modal .close-button'); 
     const newModals = document.querySelectorAll('.modal'); 
 
@@ -48,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('modal-is-open'); 
         }
     };
+
     const closeNewModal = (modal) => {
         if (modal && modal.classList.contains('is-open')) { 
             modal.classList.remove('is-open');
@@ -61,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginTriggers.forEach(trigger => {
         trigger.addEventListener('click', () => openNewModal(loginModal));
     });
+
     scheduleTriggers.forEach(trigger => {
         trigger.addEventListener('click', () => openNewModal(schedulingModal));
     });
@@ -85,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- LÓGICA CARROSSEL NA PÁGINA ---
     const carouselWrapper = document.querySelector('.onpage-carousel-wrapper');
     const track = document.querySelector('.onpage-carousel-track');
     const items = document.querySelectorAll('.onpage-carousel-item');
@@ -95,20 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (track && items.length > 0) {
         const itemsCount = items.length;
         const scrollAmount = 3; 
-        const visibleItemsDesktop = 5; // Quantos são visíveis no desktop
-        let itemWidth = items[0].offsetWidth; // Largura inicial do item
+        const visibleItemsDesktop = 5;
+        let itemWidth = items[0].offsetWidth;
         let currentIndex = 0;
         let autoScrollInterval;
-        const autoScrollDelay = 5000; // 5 segundos
+        const autoScrollDelay = 5000;
 
-        // Clonar itens para loop infinito
         function cloneItems() {
-             // Clona os últimos `visibleItemsDesktop` para o início
              for (let i = 0; i < visibleItemsDesktop; i++) {
                 const clone = items[itemsCount - 1 - i].cloneNode(true);
                 track.insertBefore(clone, items[0]);
             }
-            // Clona os primeiros `visibleItemsDesktop` para o fim
             for (let i = 0; i < visibleItemsDesktop; i++) {
                 const clone = items[i].cloneNode(true);
                 track.appendChild(clone);
@@ -116,13 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function updateItemWidth() {
-            // Recalcula a largura do item (importante para responsividade)
-             const firstItem = track.querySelector('.onpage-carousel-item'); // Pega um item real
+             const firstItem = track.querySelector('.onpage-carousel-item');
              if(firstItem) {
                 const style = window.getComputedStyle(firstItem);
                 const marginRight = parseFloat(style.marginRight) || 0;
                 const marginLeft = parseFloat(style.marginLeft) || 0;
-                // Considera padding/border se box-sizing for content-box, mas border-box é mais comum
                 itemWidth = firstItem.getBoundingClientRect().width + marginRight + marginLeft;
              }
         }
@@ -135,31 +128,28 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 track.style.transition = 'transform 0.5s ease-in-out';
             }
-            // A posição inicial real agora considera os clones no início
             const initialOffset = visibleItemsDesktop * itemWidth; 
             track.style.transform = `translateX(-${index * itemWidth + initialOffset}px)`;
             currentIndex = index;
         }
 
         function handleTransitionEnd() {
-            // Verifica se chegamos aos clones do final
             if (currentIndex >= itemsCount) {
                 track.style.transition = 'none';
-                currentIndex = currentIndex % itemsCount; // Volta ao item original equivalente
+                currentIndex = currentIndex % itemsCount;
                 const initialOffset = visibleItemsDesktop * itemWidth;
                 track.style.transform = `translateX(-${currentIndex * itemWidth + initialOffset}px)`;
             }
-             // Verifica se chegamos aos clones do início (scroll para trás)
             if (currentIndex < 0) {
                  track.style.transition = 'none';
-                 currentIndex = (currentIndex % itemsCount + itemsCount) % itemsCount; // Volta ao item original equivalente no final
+                 currentIndex = (currentIndex % itemsCount + itemsCount) % itemsCount;
                  const initialOffset = visibleItemsDesktop * itemWidth;
                  track.style.transform = `translateX(-${currentIndex * itemWidth + initialOffset}px)`;
             }
         }
 
         function startAutoScroll() {
-            stopAutoScroll(); // Garante que não haja múltiplos intervalos
+            stopAutoScroll();
             autoScrollInterval = setInterval(() => {
                 moveToNextSlide();
             }, autoScrollDelay);
@@ -170,28 +160,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         function moveToNextSlide() {
-            if (currentIndex >= itemsCount) return; // Evita disparo múltiplo durante o ajuste
+            if (currentIndex >= itemsCount) return;
             goToIndex(currentIndex + scrollAmount);
         }
         
         function moveToPrevSlide() {
-            if (currentIndex < 0) return; // Evita disparo múltiplo durante o ajuste
+            if (currentIndex < 0) return;
              goToIndex(currentIndex - scrollAmount);
         }
 
-        // --- Inicialização ---
         cloneItems();
         updateItemWidth(); 
-        // Define a posição inicial correta (mostrando os itens originais)
         goToIndex(0, false); 
         startAutoScroll();
 
-        // Event Listeners
         if (nextBtn) {
              nextBtn.addEventListener('click', () => {
                 moveToNextSlide();
-                stopAutoScroll(); // Para auto-scroll ao clicar
-                startAutoScroll(); // Reinicia após clique
+                stopAutoScroll();
+                startAutoScroll();
              });
         }
        if (prevBtn) {
@@ -204,19 +191,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
        if (track) {
             track.addEventListener('transitionend', handleTransitionEnd);
-
-            // Pausa no hover
             carouselWrapper.addEventListener('mouseenter', stopAutoScroll);
             carouselWrapper.addEventListener('mouseleave', startAutoScroll);
        }
-       
-       // Recalcular largura no resize
+        
         window.addEventListener('resize', () => {
-            stopAutoScroll(); // Para evitar saltos durante o resize
+            stopAutoScroll();
             updateItemWidth();
-            goToIndex(currentIndex, false); // Reposiciona sem animação
-            startAutoScroll(); // Reinicia
+            goToIndex(currentIndex, false);
+            startAutoScroll();
         });
     }
-
 });
